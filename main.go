@@ -1,29 +1,25 @@
 package main
 
 import (
-	"fmt"
 	"graphql/gorest/controller"
-	router "graphql/gorest/http"
 	"graphql/gorest/repository"
 	"graphql/gorest/service"
-	"net/http"
+
+	"github.com/gofiber/fiber/v2"
 )
 
-var (
-	postRepository repository.PostRepository = repository.NewFireStoreRepository()
-	postService    service.PostService       = service.NewPostService(postRepository)
-	postController controller.PostController = controller.NewPostController(postService)
-	httpRouter     router.Router             = router.NewChiRouter()
-)
+const port string = ":8080"
 
 func main() {
-	const port string = ":8080"
+	postRepository := repository.NewFireStoreRepository()
+	app := fiber.New()
 
-	httpRouter.GET("/", func(resp http.ResponseWriter, req *http.Request) {
-		fmt.Fprintln(resp, "up and running. . .")
+	postService := service.NewPostService(postRepository)
+	controller.NewPostController(app, postService)
+
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("Hello, World 👋!")
 	})
-	httpRouter.GET("/posts", postController.GetPosts)
-	httpRouter.POST("/posts", postController.AddPost)
 
-	httpRouter.SERVE(port)
+	app.Listen(port)
 }

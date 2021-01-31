@@ -1,63 +1,58 @@
 package controller
 
 import (
-	"encoding/json"
 	"graphql/gorest/entity"
-	"graphql/gorest/errors"
 	"graphql/gorest/service"
-	"net/http"
+
+	"github.com/gofiber/fiber/v2"
 )
 
-type controller struct{}
-
-var (
-	postService service.PostService
-)
-
-type PostController interface {
-	GetPosts(resp http.ResponseWriter, request *http.Request)
-	AddPost(resp http.ResponseWriter, req *http.Request)
+// Controller for
+type Controller struct {
+	service service.PostService
 }
 
-func NewPostController(service service.PostService) PostController {
-	postService = service
-	return &controller{}
+// Response for
+type Response struct {
+	Message string `json:"message"`
 }
 
-func (*controller) GetPosts(resp http.ResponseWriter, req *http.Request) {
-	resp.Header().Set("Content-type", "application/json")
-	posts, err := postService.FindAll()
-	if err != nil {
-		resp.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(resp).Encode(errors.ServiceError{Message: "Error getting posts"})
-		return
+// NewPostController for
+func NewPostController(router *fiber.App, service service.PostService) {
+	handler := &Controller{
+		service: service,
 	}
-	resp.WriteHeader(http.StatusOK)
-	json.NewEncoder(resp).Encode(posts)
+
+	router.Get("/posts", handler.GetPosts)
+	router.Post("/posts", handler.AddPost)
 }
 
-func (*controller) AddPost(resp http.ResponseWriter, req *http.Request) {
-	var post entity.Post
-	err := json.NewDecoder(req.Body).Decode(&post)
-
+// GetPosts for
+func (cont *Controller) GetPosts(c *fiber.Ctx) error {
+	res := Response{}
+	posts, err := cont.service.FindAll()
 	if err != nil {
-		resp.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(resp).Encode(errors.ServiceError{Message: "Error Unmarshaliing the request"})
-		return
+		return err
 	}
-	err1 := postService.Validate(&post)
-	if err1 != nil {
-		resp.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(resp).Encode(errors.ServiceError{Message: err1.Error()})
-		return
+	res.Message = "success"
+	return c.JSON(posts)
+}
+
+// AddPost for
+func (cont *Controller) AddPost(c *fiber.Ctx) error {
+	req := entity.Post{}
+	err := c.BodyParser(req)
+	if err != nil {
+		return err
+	}
+	err = cont.service.Validate(&req)
+	if err != nil {
+		return err
 	}
 
-	result, err := postService.Create(&post)
+	result, err := cont.service.Create(&req)
 	if err != nil {
-		resp.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(resp).Encode(errors.ServiceError{"Error saving the post"})
-		return
+		return err
 	}
-	resp.WriteHeader(http.StatusOK)
-	json.NewEncoder(resp).Encode(result)
+	return c.JSON(result)
 }
