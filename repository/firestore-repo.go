@@ -11,19 +11,19 @@ import (
 
 type repo struct{}
 
-//NewFireStoreRepository
+//NewFireStoreRepository for
 func NewFireStoreRepository() PostRepository {
 	return &repo{}
 }
 
 const (
-	projectId      string = "alsu-2d5a1"
+	projectID      string = "alsu-2d5a1"
 	collectionName string = "posts"
 )
 
-func (*repo) Save(post *entity.Post) (*entity.Post, error) {
+func (r *repo) Save(post *entity.Post) (*entity.Post, error) {
 	ctx := context.Background()
-	client, err := firestore.NewClient(ctx, projectId)
+	client, err := firestore.NewClient(ctx, projectID)
 	if err != nil {
 		log.Fatalf("Failed to create a FireStore Client: %v", err)
 		return nil, err
@@ -42,22 +42,22 @@ func (*repo) Save(post *entity.Post) (*entity.Post, error) {
 	return post, nil
 }
 
-func (*repo) FindAll() ([]entity.Post, error) {
+func (r *repo) FindAll() ([]entity.Post, error) {
 	ctx := context.Background()
-	client, err := firestore.NewClient(ctx, projectId)
+	client, err := firestore.NewClient(ctx, projectID)
 	if err != nil {
 		log.Fatalf("Failed to create a FireStore Client: %v", err)
 		return nil, err
 	}
 
 	defer client.Close()
-	done_symbol := iterator.Done
+	doneSymbol := iterator.Done
 	var posts []entity.Post
 	iterator := client.Collection(collectionName).Documents(ctx)
 	for {
 		doc, err := iterator.Next()
 
-		if err == done_symbol {
+		if err == doneSymbol {
 			break
 		}
 		if err != nil {

@@ -7,21 +7,22 @@ import (
 	"math/rand"
 )
 
+// PostService for
 type PostService interface {
 	Validate(post *entity.Post) error
 	Create(post *entity.Post) (*entity.Post, error)
 	FindAll() ([]entity.Post, error)
 }
 
-type service struct{}
-
-var (
+type service struct {
 	repo repository.PostRepository
-)
+}
 
+// NewPostService for
 func NewPostService(repo repository.PostRepository) PostService {
-	repo = repo
-	return &service{}
+	return &service{
+		repo: repo,
+	}
 }
 
 func (*service) Validate(post *entity.Post) error {
@@ -37,10 +38,10 @@ func (*service) Validate(post *entity.Post) error {
 	return nil
 
 }
-func (*service) Create(post *entity.Post) (*entity.Post, error) {
+func (s *service) Create(post *entity.Post) (*entity.Post, error) {
 	post.ID = rand.Int63()
-	return repo.Save(post)
+	return s.repo.Save(post)
 }
-func (*service) FindAll() ([]entity.Post, error) {
-	return repo.FindAll()
+func (s *service) FindAll() ([]entity.Post, error) {
+	return s.repo.FindAll()
 }
