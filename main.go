@@ -18,7 +18,7 @@ func main() {
 	controller.NewPostController(app, postService)
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World 👋!")
+		return c.SendString("Hello, World a👋!")
 	})
 
 	app.Listen(port)

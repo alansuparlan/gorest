@@ -3,6 +3,7 @@ package controller
 import (
 	"graphql/gorest/entity"
 	"graphql/gorest/service"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -40,9 +41,11 @@ func (cont *Controller) GetPosts(c *fiber.Ctx) error {
 
 // AddPost for
 func (cont *Controller) AddPost(c *fiber.Ctx) error {
+
 	req := entity.Post{}
-	err := c.BodyParser(req)
+	err := c.BodyParser(&req)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 	err = cont.service.Validate(&req)
