@@ -1,20 +1,22 @@
-FROM golang:latest
+FROM golang:1.15.7-alpine3.13 as builder
 
-LABEL maintainer="Quique <hello@pragmaticreviews.com>"
+LABEL maintainer="Quique <yourmail@mail.com>"
+
+ENV GO111MODULE=on
 
 WORKDIR /app
 
-COPY go.mod .
-
-COPY go.sum .
+COPY . ./
 
 RUN go mod download
 
-COPY . . 
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main .
 
-ENV PORT 8000
+## Distribution
+FROM alpine:latest
 
-RUN go build 
+WORKDIR /app
 
-CMD ["./gorest"]
+COPY --from=builder /app/main ./
 
+CMD [ "/app/main" ]
