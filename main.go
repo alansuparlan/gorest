@@ -11,7 +11,7 @@ import (
 const port string = ":8080"
 
 func main() {
-	postRepository := repository.NewFireStoreRepository()
+	postRepository := repository.NewSQLiteRepository()
 	app := fiber.New()
 
 	postService := service.NewPostService(postRepository)
