@@ -41,7 +41,6 @@ func (cont *Controller) GetPosts(c *fiber.Ctx) error {
 
 // AddPost for
 func (cont *Controller) AddPost(c *fiber.Ctx) error {
-
 	req := entity.Post{}
 	err := c.BodyParser(&req)
 	if err != nil {

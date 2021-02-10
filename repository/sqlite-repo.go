@@ -97,29 +97,29 @@ func (*sqliteRepo) FindAll() ([]entity.Post, error) {
 	return posts, nil
 }
 
-func (*sqliteRepo) Delete(post *entity.Post) error {
-	db, err := sql.Open("sqlite3", "./posts.db")
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
+// func (*sqliteRepo) Delete(post *entity.Post) error {
+// 	db, err := sql.Open("sqlite3", "./posts.db")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 		return err
+// 	}
 
-	tx, err := db.Begin()
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-	stmt, err := tx.Prepare("delete from posts where id = ?")
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-	defer stmt.Close()
-	_, err = stmt.Exec(post.ID)
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-	tx.Commit()
-	return nil
-}
+// 	tx, err := db.Begin()
+// 	if err != nil {
+// 		log.Fatal(err)
+// 		return err
+// 	}
+// 	stmt, err := tx.Prepare("delete from posts where id = ?")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 		return err
+// 	}
+// 	defer stmt.Close()
+// 	_, err = stmt.Exec(post.ID)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 		return err
+// 	}
+// 	tx.Commit()
+// 	return nil
+// }
